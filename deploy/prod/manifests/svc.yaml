@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: main
+  namespace: social-x-main
+spec:
+  selector:
+    app: main
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9090

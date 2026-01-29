@@ -1,0 +1,11 @@
+{
+  "isIn": "{property} 必须是以下值之一: {values}",
+  "isNumber": "{property} 必须是符合指定约束的数字",
+  "isString": "{property} 必须是字符串",
+  "notEmpty": "{property} 不能为空",
+  "isEmail": "{property} 必须是邮箱",
+  "isBoolean": "{property} 必须是布尔值",
+  "isPositive": "{property} 必须是正数",
+  "arrayMaxSize": "{property} 必须包含不超过{value}个元素。",
+  "arrayMinSize": "{property} 必须包含至少{value}个元素"
+}

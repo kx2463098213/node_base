@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+examples/
+dist/
+.env
+.claude
+temp/
+
+# IDE
+/.idea
+/.awcache
+/.vscode
+/.devcontainer
+/.classpath
+/.project
+/.settings
+*.code-workspace
+/logs
+
+# misc
+.DS_Store

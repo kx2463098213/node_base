@@ -1,0 +1,11 @@
+{
+  "isIn": "{property} must be one of the following values: {values}",
+  "isNumber": "{property} must be a number that meets the specified constraints",
+  "isString": "{property} must be string",
+  "notEmpty": "{property} cannot be empty",
+  "isEmail": "{property} must be an email address",
+  "isBoolean": "{property} must be a Boolean value",
+  "isPositive": "{property} must be a positive number",
+  "arrayMinSize": "{property} must contain at least {value} elements.",
+  "arrayMaxSize": "{property} must contain no more than {value} elements."
+}

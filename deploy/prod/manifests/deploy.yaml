@@ -1,0 +1,182 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main
+  namespace: social-x-main
+  labels:
+    app: main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 20%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: main
+    spec:
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: pulluser
+      containers:
+        - image: <IMAGE>:<IMAGE_TAG>
+          name: main
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9090
+          readinessProbe:
+            httpGet:
+              path: /deploy/ready
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /deploy/live
+              port: 9090
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                command: [ '/bin/sh', '-c', 'sleep 20' ]
+          resources:
+            limits:
+              cpu: 2
+              memory: 4Gi
+            requests:
+              cpu: 10m
+              memory: 512Mi
+          env:
+            - name: DEPLOY_ENV
+              value: prod
+            - name: MYSQL_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: MYSQL_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: REDIS_URL
+            - name: REDIS_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: REDIS_PWD
+            - name: REDIS_DB
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: REDIS_DB
+            - name: STORAGE_BUCKET_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_BUCKET_ENDPOINT
+            - name: STORAGE_PUBLIC_BUCKET_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_PUBLIC_BUCKET_ENDPOINT
+            - name: STORAGE_PUBLIC_BUCKET_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_PUBLIC_BUCKET_HOST
+            - name: STORAGE_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_REGION
+            - name: STORAGE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_BUCKET
+            - name: STORAGE_PUBLIC_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_PUBLIC_BUCKET
+            - name: STORAGE_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_ACCESS_KEY_ID
+            - name: STORAGE_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_SECRET_ACCESS_KEY
+            - name: STORAGE_PROVIDER
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: STORAGE_PROVIDER
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: MONGO_URL
+            - name: PULSAR_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: PULSAR_SERVICE_URL
+            - name: PULSAR_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: PULSAR_TOKEN
+            - name: PULSAR_OPERATION_TIMEOUT_SECONDS
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: PULSAR_OPERATION_TIMEOUT_SECONDS
+            - name: DEFAULT_CONSUMER_SUBSCRIPTION
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: DEFAULT_CONSUMER_SUBSCRIPTION
+            - name: PULSAR_NAMESPACE
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: PULSAR_NAMESPACE
+            - name: PULSAR_CLUSTER
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: PULSAR_CLUSTER
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: DATA_REPORT_MAX_VIDEOS_COUNT
+            - name: UC_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: UC_ENDPOINT
+            - name: TRACE_GRPC_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: TRACE_GRPC_ENDPOINT
+            - name: TRACE_APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: TRACE_APP_KEY
+            - name: TRACE_SERVICE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: cm-main
+                  key: TRACE_SERVICE_NAME

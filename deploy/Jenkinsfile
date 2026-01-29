@@ -1,0 +1,155 @@
+#!groovy
+
+@Library('jenkins-lib') _
+def tools = new org.devops.tools()
+def kube = new org.devops.kubernetes()
+String harborUrl = kube.getHarborUrl()
+
+String scmUrl = scm.getUserRemoteConfigs()[0].getUrl()
+String scmCredentialsId = scm.getUserRemoteConfigs()[0].getCredentialsId()
+
+String slaveYAML = kube.getSimpleYAML()
+
+String envFlag = "${env.ENV_FLAG}"
+String envProxy = "${env.ENV_PROXY}"
+String projectGroup = "socialX"
+String projectName = "social-x-main"
+
+allowProdEnvs = ['main','master','prod']
+
+k8sCredentialsId = 'socialflow-k8s-cli-key'
+if (!(envFlag in allowProdEnvs)) {
+  image = "${harborUrl}/daily/${projectName}"
+  k8sClusterContextName = 'none-prod'
+} else {
+  image = "${harborUrl}/${projectGroup}/${projectName}"
+  k8sClusterContextName = 'prod'
+}
+
+BRANCH_TAG = "${env.PARA_BRANCH_NAME}"
+
+echo image
+echo scmUrl
+echo BRANCH_TAG
+echo envFlag
+
+String k8sDirSuffix = "deploy/${envFlag}/manifests"
+String dockerDirSuffix = "deploy"
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml "${slaveYAML}"
+    }
+  }
+
+  options {
+    timestamps()  //日志会有时间
+    skipDefaultCheckout()  //删除隐式checkout scm语句
+    disableConcurrentBuilds()   //禁止并行构建
+    timeout(time: 1, unit: 'HOURS')   //流水线超时设置1h
+  }
+
+  environment {
+    dockerDir = "${WORKSPACE}/${dockerDirSuffix}"
+    k8sDir = "${WORKSPACE}/${k8sDirSuffix}"
+  }
+
+  stages {
+    stage('拉取源代码') {
+      steps {
+        timeout(time:20, unit:"MINUTES") {
+          script {
+            tools.printMsg('checkout git', 'green')
+            checkout([
+              $class: 'GitSCM', 
+              branches: [[name: "${BRANCH_TAG}"]],
+              userRemoteConfigs: [
+                [
+                  credentialsId: "${scmCredentialsId}", 
+                  url: "${scmUrl}"
+                ]
+              ]
+            ])
+
+            env.GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+            env.COMMIT_MSG = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+            env.imageTag = env.GIT_COMMIT
+          }
+        }
+      }
+    }
+
+    stage('构建Docker镜像') {
+      steps {
+        timeout(time:20, unit:"MINUTES") {
+          script {
+            tools.printMsg('构建Docker镜像', 'green')
+            dir("${WORKSPACE}") {
+                  container('kaniko') {
+                    sh """
+                      /kaniko/executor \
+                        --compressed-caching=false \
+                        --build-arg ENV_FLAG=${envFlag} \
+                        --build-arg https_proxy=${envProxy} \
+                        --build-arg http_proxy=${envProxy} \
+                        -c `pwd` \
+                        --dockerfile ${dockerDir}/Dockerfile \
+                        --cache=true \
+                        --destination ${image}:${imageTag} \
+                        --skip-tls-verify \
+                        --ignore-path /busybox
+                    """
+                  }
+            }
+          }
+        }
+      }
+    }
+
+    stage('发布到K8S') {
+      steps {
+        timeout(time:20, unit:"MINUTES") {
+          script {
+            tools.printMsg('发布到K8S', 'green')
+            withKubeConfig([credentialsId: "${k8sCredentialsId}", contextName: "${k8sClusterContextName}"]) {
+              container('kubectl') {
+                sh """
+                  grep '<IMAGE>' -rl ${k8sDir} | xargs sed -i 's#<IMAGE>#'"${image}"'#'
+                  grep '<IMAGE_TAG>' -rl ${k8sDir} | xargs sed -i 's#<IMAGE_TAG>#'"${imageTag}"'#'
+                  kubectl apply -f ${k8sDir}
+                """
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      script {
+        println("always")
+      }
+    }
+
+    success {
+      script {
+        currentBuild.description = "branch_tag: ${BRANCH_TAG} \n commit_id : ${GIT_COMMIT} \n image_tag : ${imageTag} \n commit_msg: ${COMMIT_MSG}"
+      }
+    }
+
+    failure {
+      script {
+        currentBuild.description = "构建失败"
+      }
+    }
+
+    aborted {
+      script {
+        currentBuild.description = "构建取消"
+      }
+    }
+  }
+}
