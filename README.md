@@ -16,6 +16,9 @@
 8、目前基础代码支持对接 mongodb、mysql、redis；  
 
 
+> 需求 node 版本 >= 20
+
+
 ```bash
 $ npm install
 ```
