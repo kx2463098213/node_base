@@ -3,7 +3,7 @@ import util from "util";
 import dayjs from "dayjs";
 import chalk from "chalk";
 import { isLocal, isProd, logLevel } from "@/core/config";
-import { scopeUtils } from "../scope-utils";
+import { scopeUtils } from "../utils/scope-utils";
 
 const levels: string[] = ["DEBUG", "INFO", "WARN", "ERROR", "FATAL"];
 

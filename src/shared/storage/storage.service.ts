@@ -11,7 +11,7 @@ import { TosProvider } from './providers/tos.provider'
 import { ObsProvider } from './providers/obs.provider'
 import { nanoid } from 'nanoid'
 import { Logger } from '@/common/logger/logger'
-import { scopeUtils } from '@/common/scope-utils'
+import { scopeUtils } from '@/common/utils/scope-utils'
 
 @Injectable()
 export class StorageService implements OnModuleInit {

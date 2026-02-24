@@ -5,7 +5,7 @@ import { LabelOrmEntity } from "./entity/label.orm-entity";
 import { LabelAddDataDto, LabelDeleteDto, LabelResponseDto } from "./dto/label.dto";
 import { BaseListDto } from "@/common/common.dto";
 import { ListResultDto } from "@/shared/remote/http.service";
-import { scopeUtils } from "@/common/scope-utils";
+import { scopeUtils } from "@/common/utils/scope-utils";
 
 @ApiTags("标签")
 @Controller('label')

@@ -6,7 +6,7 @@ import {
   EmployeesByAdminApiResDto, EmployeesInfoDto, UcPlatform,
   UserAdminApiResDto, UserDataDto,
 } from './user.dto'
-import { scopeUtils } from '@/common/scope-utils'
+import { scopeUtils } from '@/common/utils/scope-utils'
 import { CustomException } from '@/common/exceptions/custom.exception'
 import { ErrorCode } from '@/common/constants/error-code'
 

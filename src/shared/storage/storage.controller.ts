@@ -1,7 +1,7 @@
 import { Bind, Body, Controller, Post } from '@nestjs/common'
 import { StorageService } from './storage.service'
 import { StorageRequestDTO, DownloadUrlDTO } from './storage.dtos'
-import { scopeUtils } from '@/common/scope-utils'
+import { scopeUtils } from '@/common/utils/scope-utils'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 @Controller('storage')

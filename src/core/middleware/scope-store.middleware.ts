@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express'
-import { scopeStore } from '@/common/scope-utils'
+import { scopeStore } from '@/common/utils/scope-utils'
 import { CustomRequest } from '@/core/guards/auth.guard'
 import { Logger } from '@/common/logger/logger';
 import { nanoid } from 'nanoid';

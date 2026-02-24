@@ -1,5 +1,5 @@
 import { BeforeInsert, BeforeUpdate, Column, DeleteDateColumn, PrimaryColumn } from "typeorm";
-import { scopeUtils } from "@/common/scope-utils";
+import { scopeUtils } from "@/common/utils/scope-utils";
 import dayjs from "dayjs";
 import { GetSnowflakeId } from "@/common/utils/id-generator";
 

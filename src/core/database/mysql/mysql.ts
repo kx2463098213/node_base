@@ -13,7 +13,7 @@ import { MYSQL_CONNECTION } from "./mysql.provider";
 import { Logger } from "@/common/logger/logger";
 import { SoftDeletedEntity } from "./base-orm.entity";
 import dayjs from "dayjs";
-import { scopeUtils } from "@/common/scope-utils";
+import { scopeUtils } from "@/common/utils/scope-utils";
 
 type UpdateOptions = string | string[] | number | number[] | Date | Date[] | ObjectId | ObjectId[] | any;
 type CustomFindOptions<T> = FindOptionsWhere<T> | FindOptionsWhere<T>[];
