@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LabelService } from "./label.service";
-import { LabelOrmEntity } from "./entity/label.orm-entity";
+import { LabelOrmEntity } from "./entities/label.orm-entity";
 import { LabelAddDataDto, LabelDeleteDto, LabelResponseDto } from "./dto/label.dto";
 import { BaseListDto } from "@/common/common.dto";
 import { ListResultDto } from "@/shared/remote/http.service";
@@ -20,7 +20,7 @@ export class LabelController {
   @ApiResponse({ status: 200, description: '成功获取标签列表' })
   async getLabelList(@Body() data: BaseListDto): Promise<ListResultDto<LabelResponseDto>> {
     const tenantId = scopeUtils.getTenantId();
-    return await this.labelSvc.list(tenantId, data)
+    return this.labelSvc.list(tenantId, data)
   }
 
   @Post('/add')
@@ -29,7 +29,7 @@ export class LabelController {
   @ApiResponse({ status: 200, description: '成功添加标签' })
   async add(@Body() data: LabelAddDataDto): Promise<LabelOrmEntity> {
     const tenantId = scopeUtils.getTenantId();
-    return await this.labelSvc.add(tenantId, data);
+    return this.labelSvc.add(tenantId, data);
   }
 
   @Post('/delete')
@@ -38,6 +38,6 @@ export class LabelController {
   @ApiResponse({ status: 200, description: '成功删除标签' })
   async delete(@Body() data: LabelDeleteDto): Promise<boolean> {
     const tenantId = scopeUtils.getTenantId();
-    return await this.labelSvc.delete(tenantId, data);
+    return this.labelSvc.delete(tenantId, data);
   }
 }

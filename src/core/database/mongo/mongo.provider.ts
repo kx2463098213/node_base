@@ -19,7 +19,7 @@ export const MongoProvider: FactoryProvider<DataSource> = {
         url: mongoUrl,
         authSource: "admin",
         type: "mongodb",
-        entities: [__dirname + "/../../../modules/**/*.entity{.ts,.js}"],
+        entities: [__dirname + "/../../../modules/**/entities/**/*.entity{.ts,.js}"],
         synchronize: false,
       };
       logger.debug("连接mongo: %s", mongoUrl);
