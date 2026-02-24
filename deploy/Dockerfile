@@ -26,7 +26,7 @@ RUN npm run build
 FROM swr.cn-south-1.myhuaweicloud.com/lightai-ops/node:20.10.0-alpine
 
 # 设置工作目录
-WORKDIR /lightai-saas-manage
+WORKDIR /base-project
 
 # 替换 Alpine 镜像源并安装必要组件
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
@@ -42,15 +42,15 @@ RUN npm config set registry https://registry.npmjs.org --global && \
     npm install -g pm2@5.3.0
 
 # 复制打包后的文件
-COPY --from=package-builder /lightai-saas-manage/node_modules /lightai-saas-manage/node_modules
-COPY --from=package-builder /lightai-saas-manage/dist /lightai-saas-manage/dist
-COPY ./pm2 /lightai-saas-manage/pm2
+COPY --from=package-builder /base-project/node_modules /base-project/node_modules
+COPY --from=package-builder /base-project/dist /base-project/dist
+COPY ./pm2 /base-project/pm2
 
 # 暴露端口
-EXPOSE 8082
+EXPOSE 9421
 
 # 设置环境变量
-ENV PORT=8082
+ENV PORT=9421
 ENV ENV_FLAG=${ENV_FLAG}
 
 # 指定容器启动命令

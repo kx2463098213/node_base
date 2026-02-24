@@ -1,15 +1,17 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
-import {ConfigModule, ConfigService} from "@nestjs/config";
+import {ConfigModule} from "@nestjs/config";
 import { DeployModule } from "./modules/deploy/deploy.module";
-import { DatabaseModule } from "./database/database.module";
+import { DatabaseModule } from "./core/database/database.module";
 import { GlobalModule } from "./global.module";
-import { SfNestTraceModule } from "sf-nest-trace";
-import { BaseException } from "./exception/custom.exception";
-import { config } from "./config";
-import { APP_GUARD } from "@nestjs/core";
-import { UCAuthGuard } from "./modules/remote/uc/auth.guard";
+import { config } from "./core/config";
+import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { UCAuthGuard } from "./core/guards/auth.guard";
 import { LabelModule } from "./modules/label/label.module";
-import { RequestContextMiddleware } from "./middleware/scope-store.middleware";
+import { ScopeStoreMiddleware } from "./core/middleware/scope-store.middleware";
+import { RequestLogMiddleware } from "./core/middleware/req-log-middleware";
+import { CustomExceptionFilter } from "./core/filters/custom-exception.filter";
+import { TransformInterceptor } from "./core/interceptors/transform.interceptor";
+import { I18nValidationPipe } from 'nestjs-i18n';
 
 @Module({
   imports: [
@@ -18,30 +20,34 @@ import { RequestContextMiddleware } from "./middleware/scope-store.middleware";
     DatabaseModule,
     DeployModule,
     LabelModule,
-    SfNestTraceModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (confSvc: ConfigService) => {
-        const traceConfig = confSvc.get('trace');
-        if (!traceConfig) {
-          throw new BaseException(500, 'Trace 配置缺失');
-        }
-        return traceConfig;
-      },
-    })
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: UCAuthGuard,
-    }
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: CustomExceptionFilter,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: I18nValidationPipe,
+    },
   ]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RequestContextMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.ALL,
-    });
+    consumer
+    .apply(RequestLogMiddleware, ScopeStoreMiddleware)
+      .exclude(
+        { path: 'deploy/live', method: RequestMethod.ALL },
+        { path: 'deploy/ready', method: RequestMethod.ALL },
+      )
+      .forRoutes('*');
   }
 }

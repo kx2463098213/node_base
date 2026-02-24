@@ -165,18 +165,3 @@ spec:
                 secretKeyRef:
                   name: cm-main
                   key: UC_ENDPOINT
-            - name: TRACE_GRPC_ENDPOINT
-              valueFrom:
-                secretKeyRef:
-                  name: cm-main
-                  key: TRACE_GRPC_ENDPOINT
-            - name: TRACE_APP_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: cm-main
-                  key: TRACE_APP_KEY
-            - name: TRACE_SERVICE_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: cm-main
-                  key: TRACE_SERVICE_NAME

@@ -1,15 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { Logger } from "@/logger/logger";
-import { MysqlService } from "@/database/mysql/mysql";
+import { Logger } from "@/common/logger/logger";
+import { MysqlService } from "@/core/database/mysql/mysql";
 import { LabelAddDataDto, LabelDeleteDto, LabelResponseDto } from "./dto/label.dto";
 import { LabelOrmEntity } from "./entity/label.orm-entity";
-import { scopeUtils } from "@/scope-store";
-import { BaseException } from "@/exception/custom.exception";
+import { BaseException } from "@/common/exceptions/custom.exception";
 import { Transactional } from "typeorm-transactional";
 import { In } from "typeorm";
-import { ListResultDto } from "../remote/http.service";
+import { ListResultDto } from "../../shared/remote/http.service";
 import { BaseListDto } from "@/common/common.dto";
-import { UserService } from "../remote/uc/user.service";
+import { UserService } from "../../shared/remote/uc/user.service";
 
 @Injectable()
 export class LabelService {
@@ -20,16 +19,7 @@ export class LabelService {
     private readonly userSvc: UserService,
   ) { }
 
-    get tenantId() {
-    return scopeUtils.getTenantId()
-  }
-
-  get userId() {
-    return scopeUtils.getUserId()
-  }
-
-  async list(data: BaseListDto): Promise<ListResultDto<LabelResponseDto>> {
-    const tenantId = this.tenantId;
+  async list(tenantId: number, data: BaseListDto): Promise<ListResultDto<LabelResponseDto>> {
     const { page, size, word } = data
     const builder = this.mysql
       .createQueryBuilder(LabelOrmEntity, 'label')
@@ -62,8 +52,7 @@ export class LabelService {
     return { total, list }
   }
 
-  async add(data: LabelAddDataDto): Promise<LabelOrmEntity> {
-    const tenantId = this.tenantId;
+  async add(tenantId: number, data: LabelAddDataDto): Promise<LabelOrmEntity> {
     const existingLabel = await this.mysql
       .createQueryBuilder(LabelOrmEntity, 'label')
       .where('label.name = :name', { name: data.name })
@@ -84,8 +73,7 @@ export class LabelService {
   }
 
   @Transactional()
-  async delete(data: LabelDeleteDto): Promise<boolean> {
-    const tenantId = this.tenantId as number;
+  async delete(tenantId: number, data: LabelDeleteDto): Promise<boolean> {
     // const ids = _.union(data.ids).map((id) => BigInt(id))
     const ids = data.ids;
     await this.mysql.softDelete(LabelOrmEntity, { tenantId, id: In(ids) });
