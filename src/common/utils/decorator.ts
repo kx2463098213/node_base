@@ -1,4 +1,4 @@
-import { BaseException } from "../exceptions/custom.exception";
+import { BaseException } from "@/common/exceptions/custom.exception";
 import { Eval } from "./util";
 
 type ExpKeyGetter = (...args: any[]) => string;

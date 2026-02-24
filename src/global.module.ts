@@ -17,7 +17,7 @@ import { I18NModule } from './shared/i18n/i18n.modules';
     I18NModule,
     RemoteModule,
       I18nModule.forRoot({
-      // 设置默认语言为英语
+      // 设置默认语言为中文
       fallbackLanguage: LANGUAGE_TYPE.Zh_CN,
       // 配置语言文件加载选项
       loaderOptions: {

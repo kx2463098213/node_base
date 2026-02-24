@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ErrorCode } from '../constants/error-code';
+import { ErrorCode } from '@/common/constants/error-code';
 
 export class BaseException extends HttpException {
   constructor(code: number, message: string, httpCode = HttpStatus.OK) {

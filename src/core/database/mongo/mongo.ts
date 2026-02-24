@@ -1,6 +1,4 @@
-import {
-  Inject, Injectable, OnApplicationShutdown,
-} from "@nestjs/common";
+import { Inject, Injectable, OnApplicationShutdown } from "@nestjs/common";
 import {
   AggregateOptions, CountOptions, DataSource, DeleteResult, EntityMetadata,
   EntityTarget, FilterOperators, FindManyOptions, FindOneAndUpdateOptions,

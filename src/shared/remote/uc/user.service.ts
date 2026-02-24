@@ -21,14 +21,13 @@ export class UserService {
     this.ucEndpoint = this.config.get('uc.endpoint') as string;
   }
 
-  getUserToken() : string {
+  getUserToken(): string {
     const originalToken = scopeUtils.getRequest()?.token;
     if (!originalToken) {
       throw new CustomException(ErrorCode.NotLogin);
     }
     return `Bearer ${originalToken}`;
   }
-
 
   async getUserData(): Promise<UserDataDto> {
     const ucToken = this.getUserToken();
@@ -221,7 +220,7 @@ export class UserService {
       page: page || 1,
       size: size || 200,
       deleted: false,
-    };
+    }
     tenantIds = this.simplifyArray(tenantIds)
     if (tenantIds.length) {
       data['ids'] = tenantIds

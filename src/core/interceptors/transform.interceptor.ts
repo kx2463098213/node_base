@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { isLocal } from '@/core/config';
 import { ResultDto } from '@/shared/remote/http.service';
 import { Logger } from '@/common/logger/logger';
+import { scopeUtils } from '@/common/utils/scope-utils';
 
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, ResultDto<T>> {
@@ -19,7 +20,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, ResultDto<T>>
     return next.handle().pipe(
       map(
         data => {
-          const traceId = '';
+          const requestId = scopeUtils.getRequestId();
           // 日志信息
           const needLog = ((isLocal || +(process.env.REQ_LOG || '0')) && !blackList.includes(path))
           if (needLog) {
@@ -29,7 +30,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, ResultDto<T>>
           return {
             data,
             code: 0,
-            traceId,
+            requestId,
           };
         },
       ),

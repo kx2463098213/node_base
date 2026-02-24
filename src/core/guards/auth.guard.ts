@@ -5,10 +5,10 @@ import url from 'url'
 import { checkIs, isAvailableData } from '@/common/utils/util'
 import { isLocal } from '@/core/config'
 import { CustomException } from '@/common/exceptions/custom.exception'
-import { UserService } from '../../shared/remote/uc/user.service'
+import { UserService } from '@/shared/remote/uc/user.service'
 import { ErrorCode } from '@/common/constants/error-code'
 import { DeepPartial } from 'typeorm'
-import { UserDataDto } from '../../shared/remote/uc/user.dto'
+import { UserDataDto } from '@/shared/remote/uc/user.dto'
 import { Request } from "express";
 
 export type CurrentUser = DeepPartial<UserDataDto>
@@ -28,7 +28,8 @@ export class UCAuthGuard {
     '/deploy/ready',
     '/deploy/live',
     new RegExp('/admin/')
-  ]
+  ];
+
   constructor(
     private ucService: UserService,
   ) { }

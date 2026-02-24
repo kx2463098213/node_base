@@ -3,7 +3,7 @@ import util from "util";
 import dayjs from "dayjs";
 import chalk from "chalk";
 import { isLocal, isProd, logLevel } from "@/core/config";
-import { scopeUtils } from "../utils/scope-utils";
+import { scopeUtils } from "@/common/utils/scope-utils";
 
 const levels: string[] = ["DEBUG", "INFO", "WARN", "ERROR", "FATAL"];
 
@@ -71,7 +71,7 @@ export class Logger {
   }
 
   private requestId(): string {
-    return scopeUtils.getRequestId();
+    return Fmt.bracket(scopeUtils.getRequestId());
   }
 
   private format(level: string, fmt: string, ...args: any): string {

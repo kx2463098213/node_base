@@ -43,11 +43,11 @@ import { I18nValidationPipe } from 'nestjs-i18n';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-    .apply(RequestLogMiddleware, ScopeStoreMiddleware)
+    .apply(ScopeStoreMiddleware, RequestLogMiddleware)
       .exclude(
         { path: 'deploy/live', method: RequestMethod.ALL },
         { path: 'deploy/ready', method: RequestMethod.ALL },
       )
-      .forRoutes('*');
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

@@ -12,7 +12,7 @@ export class ScopeStoreMiddleware implements NestMiddleware {
   use(req: Request, _res: Response, next: NextFunction) {
     let requestId = req.headers['x-request-id'] as string;
     if (!requestId) {
-      this.logger.info('req path: %s, no requestId', req.path);
+      // this.logger.info('req path: %s, no requestId', req.path);
       requestId = nanoid(20);
     }
 

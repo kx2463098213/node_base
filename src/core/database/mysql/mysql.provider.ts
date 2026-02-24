@@ -19,7 +19,7 @@ export const MysqlProvider: FactoryProvider<DataSource> = {
       const connectConf: MysqlConnectionOptions = {
         url: mysqlUrl,
         type: "mysql",
-        entities: [__dirname + "/../../modules/*/entity/**/*orm-entity.{ts,js}"],
+        entities: [__dirname + "/../../../modules/**/entity/**/*orm-entity.{ts,js}"],
         synchronize: false,
         connectorPackage: "mysql2",
         namingStrategy: new SnakeNamingStrategy(), // 自动将实体表字段名驼峰转下划线

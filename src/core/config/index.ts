@@ -7,7 +7,7 @@ export function config() {
   return {
     port: process.env.PORT || 9421,
     uc: {
-      endpoint: process.env.UC_ENDPOINT || 'https://api.sf.lightai.cn/uc',
+      endpoint: process.env.UC_ENDPOINT || 'http://localhost:8081',
     },
     redis: {
       url: process.env.REDIS_URL || 'redis://nondeprod-reids1.redis.ivolces.com:6379',

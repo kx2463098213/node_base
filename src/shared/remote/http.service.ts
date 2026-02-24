@@ -2,6 +2,8 @@ import { HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { Logger } from "@/common/logger/logger";
 import { getErrMsg } from "@/common/utils/util";
+import _ from "lodash";
+import { scopeUtils } from "@/common/utils/scope-utils";
 
 export class ResultDto<T> {
 	code: number = 0;
@@ -26,6 +28,9 @@ export class HttpService {
 				const url = config.url;
 				const params = config.params || config.data;
 				const headers = config.headers;
+				if (_.isEmpty(headers['x-request-id'])) {
+					headers['x-request-id'] = scopeUtils.getRequestId();
+				}
 				const msg = `Remote request Url: ${url}, params:${JSON.stringify(params)}, headers: ${JSON.stringify(headers)}`;
 				this.logger.debug(msg);
 				return config;

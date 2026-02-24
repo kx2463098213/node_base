@@ -6,9 +6,9 @@ import { LabelOrmEntity } from "./entity/label.orm-entity";
 import { BaseException } from "@/common/exceptions/custom.exception";
 import { Transactional } from "typeorm-transactional";
 import { In } from "typeorm";
-import { ListResultDto } from "../../shared/remote/http.service";
+import { ListResultDto } from "@/shared/remote/http.service";
 import { BaseListDto } from "@/common/common.dto";
-import { UserService } from "../../shared/remote/uc/user.service";
+import { UserService } from "@/shared/remote/uc/user.service";
 
 @Injectable()
 export class LabelService {

@@ -9,9 +9,13 @@ export class RequestLogMiddleware implements NestMiddleware {
 
   use(req: Request, _res: Response, next: NextFunction) {
     const { ip, method, path, params, query, body } = req;
-    let logFormat = `${ip} ${method} ${path}`
-    if (!_.isEmpty(params)) {
-      logFormat += `Params: ${JSON.stringify(params)};`;
+    let logFormat = `${ip} ${method} ${path} `;
+
+    // 当中间件在全局注册并使用 .forRoutes('*') 时，* 会被当作通配符路由参数，导致整个路径被捕获到 params[0] 中
+    // params 应该只记录路由参数（如 /user/:id 中的 id），而不是整个路径
+    const filteredParams = _.omit(params, ['0']);
+    if (!_.isEmpty(filteredParams)) {
+      logFormat += `Params: ${JSON.stringify(filteredParams)};`;
     }
     if (!_.isEmpty(query)) {
       logFormat += `Query: ${JSON.stringify(query)};`;
@@ -25,6 +29,14 @@ export class RequestLogMiddleware implements NestMiddleware {
 }
 
 const getParam = (body: any) => {
-  const logParams = _.clone(body?.data) || {};
+  const logParams = _.clone(body) || {};
+  const paramKeys = Object.keys(logParams);
+  const intersection = _.intersection(paramKeys, ['password', 'oldPassword', 'newPassword', 'pwd']);
+  _.each(intersection, (it) => {
+  	const value = logParams[it];
+  	if (value) {
+  		logParams[it] = '******';
+  	}
+  });
   return logParams;
-} 
+}
