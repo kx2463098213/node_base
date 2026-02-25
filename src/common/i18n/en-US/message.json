@@ -1,3 +1,4 @@
 {
-  "401": "Not Login"
+  "401": "Not Login",
+  "10001": "Label [{name}] already exists"
 }

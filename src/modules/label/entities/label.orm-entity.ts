@@ -1,9 +1,9 @@
 import { Column, Entity } from 'typeorm'
-import { TenantBaseEntity } from '@/core/database/mysql/base-orm.entity'
+import { TenantBaseOrmEntity } from '@/core/database/mysql/base-orm.entity'
 import { BusinessLevel, MaterialType } from '@/common/constants/label.enum';
 
 @Entity('label')
-export class LabelOrmEntity extends TenantBaseEntity {
+export class LabelOrmEntity extends TenantBaseOrmEntity {
   @Column({ type: 'varchar', comment: '标签名字' })
   name: string
 

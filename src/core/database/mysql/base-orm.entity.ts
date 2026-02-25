@@ -3,7 +3,7 @@ import { scopeUtils } from "@/common/utils/scope-utils";
 import dayjs from "dayjs";
 import { GetSnowflakeId } from "@/common/utils/id-generator";
 
-export class SoftDeletedEntity {
+export class SoftDeletedOrmEntity {
   @DeleteDateColumn({ type: 'timestamp', comment: '删除时间戳' })
   deletedAt: string;
 
@@ -11,7 +11,7 @@ export class SoftDeletedEntity {
   deletedBy: number;
 }
 
-export class BusinessBaseEntity extends SoftDeletedEntity {
+export class BusinessBaseOrmEntity extends SoftDeletedOrmEntity {
   @PrimaryColumn({ type: 'bigint', comment: '主键ID' })
   id: bigint;
 
@@ -53,7 +53,7 @@ export class BusinessBaseEntity extends SoftDeletedEntity {
   }
 }
 
-export class TenantBaseEntity extends BusinessBaseEntity {
+export class TenantBaseOrmEntity extends BusinessBaseOrmEntity {
   @Column({ type: 'integer', default: 0, comment: '租户ID' })
   tenantId: number
 

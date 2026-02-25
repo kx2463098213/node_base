@@ -12,6 +12,7 @@ import { RequestLogMiddleware } from "@/core/middleware/req-log-middleware";
 import { CustomExceptionFilter } from "@/core/filters/custom-exception.filter";
 import { TransformInterceptor } from "@/core/interceptors/transform.interceptor";
 import { I18nValidationPipe } from 'nestjs-i18n';
+import { LogModule } from "./modules/log/log.module";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { I18nValidationPipe } from 'nestjs-i18n';
     DatabaseModule,
     DeployModule,
     LabelModule,
+    LogModule,
   ],
   providers: [
     {

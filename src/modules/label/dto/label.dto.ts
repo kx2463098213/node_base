@@ -26,6 +26,6 @@ export interface LabelResponseDto {
   id: bigint;
   name: string;
   updatedAt: string;
-  updatedBy: string;
+  createdBy: string;
   description: string;
 }

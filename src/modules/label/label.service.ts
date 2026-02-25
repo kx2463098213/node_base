@@ -2,12 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { Logger } from "@/common/logger/logger";
 import { LabelAddDataDto, LabelDeleteDto, LabelResponseDto } from "./dto/label.dto";
 import { LabelOrmEntity } from "./entities/label.orm-entity";
-import { BaseException } from "@/common/exceptions/custom.exception";
+import { CustomException } from "@/common/exceptions/custom.exception";
 import { Transactional } from "typeorm-transactional";
 import { ListResultDto } from "@/shared/remote/http.service";
 import { BaseListDto } from "@/common/common.dto";
 import { UserService } from "@/shared/remote/uc/user.service";
 import { LabelRepository } from "./repositories/label.repository";
+import { ErrorCode } from "@/common/constants/error-code";
 
 @Injectable()
 export class LabelService {
@@ -22,7 +23,7 @@ export class LabelService {
     const { page, size, word } = data;
     const [items, total] = await this.labelRepo.findByTenantWithPagination(tenantId, page, size, word);
 
-    const userIds = [...new Set(items.map(item => item.updatedBy))];
+    const userIds = [...new Set<number>(items.map(it => it.createdBy))];
     const employeeList = await this.userSvc.getEmployeesByAdminApi(userIds);
     const employeeMap = new Map(employeeList.items.map(v => [v.userId, v.name]));
 
@@ -31,7 +32,7 @@ export class LabelService {
         id: item.id,
         name: item.name,
         updatedAt: item.updatedAt.toString(),
-        updatedBy: employeeMap.get(item.updatedBy) || '',
+        createdBy: employeeMap.get(item.createdBy) || '',
         description: item.description
       }
     });
@@ -40,18 +41,20 @@ export class LabelService {
   }
 
   async add(tenantId: number, data: LabelAddDataDto): Promise<LabelOrmEntity> {
-    const existingLabel = await this.labelRepo.findByNameAndTenant(data.name, tenantId);
+    const { name, description } = data;
+    const existingLabel = await this.labelRepo.findByNameAndTenant(name, tenantId);
     if (existingLabel) {
-      throw new BaseException(400, "标签已经存在");
+      // 通过 CustomExceptionFilter 完成错误信息 i18n
+      throw new CustomException(ErrorCode.LabelExists, { name });
     }
 
     const record = new LabelOrmEntity();
-    record.name = data.name;
-    if (data.description) {
-      record.description = data.description;
+    record.name = name;
+    if (description) {
+      record.description = description;
     }
     const label = await this.labelRepo.save(record);
-    return label;
+    return label as LabelOrmEntity;
   }
 
   @Transactional()

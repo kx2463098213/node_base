@@ -1,24 +1,25 @@
 import { Injectable } from "@nestjs/common";
-import { MysqlService } from "@/core/database/mysql/mysql";
+import { EntityManager, In } from "typeorm";
 import { LabelOrmEntity } from "../entities/label.orm-entity";
-import { In } from "typeorm";
+import { MysqlService } from "@/core/database/mysql/mysql";
+import { MysqlBaseRepository } from "@/core/database/mysql/mysql.base.repository";
 
 @Injectable()
-export class LabelRepository {
+export class LabelRepository extends MysqlBaseRepository<LabelOrmEntity> {
 
-  constructor(
-    private readonly mysql: MysqlService
-  ) {}
+  constructor(mysql: MysqlService) {
+    super(mysql, LabelOrmEntity, 'Label');
+  }
 
-  async findByNameAndTenant(name: string, tenantId: number): Promise<LabelOrmEntity | null> {
-    return this.mysql.createQueryBuilder(LabelOrmEntity, 'label')
+  async findByNameAndTenant(name: string, tenantId: number) {
+    return this._getRepo().createQueryBuilder('label')
       .where('label.name = :name', { name })
       .andWhere('label.tenantId = :tenantId', { tenantId })
       .getOne();
   }
 
   async findByTenantWithPagination(tenantId: number, page: number, size: number, word?: string): Promise<[LabelOrmEntity[], number]> {
-    const builder = this.mysql.createQueryBuilder(LabelOrmEntity, 'label')
+    const builder = this._getRepo().createQueryBuilder('label')
       .andWhere('label.tenantId = :tenantId', { tenantId })
       .orderBy('label.updatedAt', 'DESC')
       .skip((page - 1) * size)
@@ -31,11 +32,7 @@ export class LabelRepository {
     return builder.getManyAndCount();
   }
 
-  async save(label: LabelOrmEntity): Promise<LabelOrmEntity> {
-    return this.mysql.save(label);
-  }
-
-  async softDeleteByIds(tenantId: number, ids: string[]): Promise<void> {
-    await this.mysql.softDelete(LabelOrmEntity, { tenantId, id: In(ids) });
+  async softDeleteByIds(tenantId: number, ids: string[], manager?: EntityManager) {
+    return this.softDelete({ tenantId, id: In(ids) }, manager);
   }
 }
