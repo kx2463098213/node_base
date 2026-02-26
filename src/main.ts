@@ -8,7 +8,7 @@ import bodyParser from "body-parser";
 import { logger } from 'nestjs-i18n';
 import { Logger } from "./common/logger/logger";
 import { isLocal } from "./core/config";
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
 import { initializeTransactionalContext } from "typeorm-transactional";
 import { MyI18nService } from "./shared/i18n/my.i18n.service";
 import { LANGUAGE_TYPE } from "./common/common.dto";
@@ -57,16 +57,16 @@ async function bootstrap(): Promise<void> {
 bootstrap()
 
 function initSwagger(app: INestApplication): void {
-    const options = new DocumentBuilder()
+  const options = new DocumentBuilder()
     .setTitle('BaseProject')
-    .setDescription('BaseProject  接口文档接口文档')
+    .setDescription('A basic Nodejs project, based on NestJs.')
     .setVersion('0.1')
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        description: '请输入 Bearer Token（用于接口调试）',
+        description: 'Bearer Token',
       },
       'bearer'
     )
@@ -85,11 +85,19 @@ function initSwagger(app: INestApplication): void {
   }
 
   const myI18nService = app.get(MyI18nService);
-  const translatedDoc = myI18nService.translateSwaggerDocument(document, LANGUAGE_TYPE.Zh_CN) as any;
-  SwaggerModule.setup('docs', app, translatedDoc);
+  SwaggerModule.setup('docs', app, document, {
+    patchDocumentOnRequest: (req: any, _res: any, doc: any) => {
+      const lang = req.headers?.['accept-language']?.split(',')?.[0] || LANGUAGE_TYPE.Zh_CN;
+      return myI18nService.translateSwaggerDocument(doc, lang) as OpenAPIObject;
+    },
+    swaggerOptions: {
+      // 这里的配置会影响 Swagger UI 的行为
+      persistAuthorization: true,
+    }
+  });
 
   app.getHttpAdapter().get('/openapi.json', (req, res) => {
-    const lang = req['headers']?.['accept-language'] || LANGUAGE_TYPE.Zh_CN;
+    const lang = req.headers?.['accept-language'] || LANGUAGE_TYPE.Zh_CN;
     const translatedDoc = myI18nService.translateSwaggerDocument(document, lang);
     res.json(translatedDoc);
   });
