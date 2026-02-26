@@ -24,23 +24,23 @@ export class LabelService {
     const [items, total] = await this.labelRepo.findByTenantWithPagination(tenantId, page, size, word);
 
     const userIds = [...new Set<number>(items.map(it => it.createdBy))];
-    const employeeList = await this.userSvc.getEmployeesByAdminApi(userIds);
-    const employeeMap = new Map(employeeList.items.map(v => [v.userId, v.name]));
+    const users = await this.userSvc.getUsersByAdminApi(userIds);
+    const userMap = new Map(users.items.map(v => [v._id, v.name]));
 
-    const list = items.map(item => { 
-      return {
-        id: item.id,
-        name: item.name,
-        updatedAt: item.updatedAt.toString(),
-        createdBy: employeeMap.get(item.createdBy) || '',
-        description: item.description
-      }
+    const list = items.map(it => {
+      const dto = new LabelResponseDto(it);
+      const userId = dto.createdBy;
+        dto.userInfo = {
+          id: userId,
+          name: userMap.get(userId) || ''
+        }
+      return dto;
     });
 
     return { total, list }
   }
 
-  async add(tenantId: number, data: LabelAddDataDto): Promise<LabelOrmEntity> {
+  async add(tenantId: number, data: LabelAddDataDto): Promise<LabelResponseDto> {
     const { name, description } = data;
     const existingLabel = await this.labelRepo.findByNameAndTenant(name, tenantId);
     if (existingLabel) {
@@ -54,7 +54,7 @@ export class LabelService {
       record.description = description;
     }
     const label = await this.labelRepo.save(record);
-    return label as LabelOrmEntity;
+    return new LabelResponseDto(label as LabelOrmEntity);
   }
 
   @Transactional()

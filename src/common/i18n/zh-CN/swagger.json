@@ -3,6 +3,15 @@
     "log": "日志管理（Mongo 示例）",
     "label": "标签管理（MySQL 示例）"
   },
+  "user": {
+    "id": "用户 ID",
+    "name": "用户名称",
+    "info": "用户信息"
+  },
+  "tenant": {
+    "id": "租户ID",
+    "name": "租户名称"
+  },
   "api": {
     "label": {
       "list": "标签列表",
@@ -30,6 +39,20 @@
     },
     "log": {
       "reqId": "请求 id"
+    }
+  },
+  "resp": {
+    "code": "返回码, 0 表示请求成功",
+    "data": "数据对象",
+    "common": {
+      "createdTime": "创建时间（unix 时间戳）",
+      "createdBy": "创建人 id",
+      "updatedTime": "更新时间（unix 时间戳）",
+      "updatedBy": "更新人 id"
+    },
+    "label": {
+      "name": "标签名称",
+      "desc": "标签描述"
     }
   }
 }

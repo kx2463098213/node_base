@@ -3,6 +3,15 @@
     "log": "Log Manager (MongoDB)",
     "label": "Label Manager (MySQL)"
   },
+    "user": {
+    "id": "User ID",
+    "name": "User Name",
+    "info": "User Info"
+  },
+  "tenant": {
+    "id": "Tenant Id",
+    "name": "Tenant Name"
+  },
   "api": {
     "label": {
       "list": "Label List",
@@ -30,6 +39,20 @@
     },
     "log": {
       "reqId": "Request id"
+    }
+  },
+  "resp": {
+    "code": "Response code, 0 means success",
+    "data": "Data Object",
+    "common": {
+      "createdTime": "Created time (unix Timestamp)",
+      "createdBy": "Create user id",
+      "updatedTime": "Updated time (unix Timestamp)",
+      "updatedBy": "Update user id"
+    },
+    "label": {
+      "name": "Label Name",
+      "desc": "Label description"
     }
   }
 }

@@ -1,5 +1,7 @@
 import { Controller, Post, Body } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiExcludeEndpoint } from "@nestjs/swagger";
+import {
+  ApiTags, ApiOperation, ApiExcludeEndpoint, ApiBody, ApiResponse,
+} from "@nestjs/swagger";
 import { LogService } from "./log.service";
 import {
   GetByReqIdDto, LogCreateDto, LogDeleteDto, LogListReqDto,
@@ -13,6 +15,8 @@ export class LogController {
 
   @Post('list')
   @ApiOperation({ summary: 'api.log.list' })
+  @ApiBody({ type: LogListReqDto })
+  @ApiResponse({ status: 200, description: 'api.log.list' })
   async list(@Body() data: LogListReqDto) {
     const tenantId = scopeUtils.getTenantId();
     return this.logService.list(tenantId, data);
@@ -20,6 +24,8 @@ export class LogController {
 
   @Post('get-by-request-id')
   @ApiOperation({ summary: 'api.log.getByReqId' })
+  @ApiBody({ type: GetByReqIdDto })
+  @ApiResponse({ status: 200, description: 'api.log.getByReqId' })
   async findByRequestId(@Body() data: GetByReqIdDto) {
     return this.logService.findByRequestId(data);
   }

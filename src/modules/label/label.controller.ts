@@ -1,9 +1,10 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LabelService } from "./label.service";
-import { LabelOrmEntity } from "./entities/label.orm-entity";
-import { LabelAddDataDto, LabelDeleteDto, LabelResponseDto } from "./dto/label.dto";
-import { BaseListDto } from "@/common/common.dto";
+import {
+  LabelAddDataDto, LabelDeleteDto, LabelListRespDto, LabelResponseDto,
+} from "./dto/label.dto";
+import { BaseListDto, BooleanResDto } from "@/common/common.dto";
 import { ListResultDto } from "@/shared/remote/http.service";
 import { scopeUtils } from "@/common/utils/scope-utils";
 
@@ -17,7 +18,7 @@ export class LabelController {
   @Post('/list')
   @ApiOperation({ summary: 'api.label.list' })
   @ApiBody({ type: BaseListDto })
-  @ApiResponse({ status: 200, description: 'api.label.list' })
+  @ApiResponse({ status: 200, description: 'api.label.list', type: LabelListRespDto })
   async getLabelList(@Body() data: BaseListDto): Promise<ListResultDto<LabelResponseDto>> {
     const tenantId = scopeUtils.getTenantId();
     return this.labelSvc.list(tenantId, data)
@@ -26,8 +27,8 @@ export class LabelController {
   @Post('/add')
   @ApiOperation({ summary: 'api.label.add' })
   @ApiBody({ type: LabelAddDataDto })
-  @ApiResponse({ status: 200, description: 'api.label.add' })
-  async add(@Body() data: LabelAddDataDto): Promise<LabelOrmEntity> {
+  @ApiResponse({ status: 200, description: 'api.label.add', type: LabelResponseDto })
+  async add(@Body() data: LabelAddDataDto): Promise<LabelResponseDto> {
     const tenantId = scopeUtils.getTenantId();
     return this.labelSvc.add(tenantId, data);
   }
@@ -35,7 +36,7 @@ export class LabelController {
   @Post('/delete')
   @ApiOperation({ summary: 'api.label.delete' })
   @ApiBody({ type: LabelDeleteDto })
-  @ApiResponse({ status: 200, description: 'api.label.delete' })
+  @ApiResponse({ status: 200, description: 'api.label.delete', type: BooleanResDto })
   async delete(@Body() data: LabelDeleteDto): Promise<boolean> {
     const tenantId = scopeUtils.getTenantId();
     return this.labelSvc.delete(tenantId, data);
