@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { Logger } from "@/common/logger/logger";
-import { LogCreateDto, LogDeleteDto, LogResponseDto } from "./dto/log.dto";
+import {
+  GetByReqIdDto,
+  LogCreateDto, LogDeleteDto, LogListReqDto, LogResponseDto,
+} from "./dto/log.dto";
 import { LogEntity } from "./entities/log.entity";
 import { LogRepository } from "./repositories/log.repository";
 import { ListResultDto } from "@/shared/remote/http.service";
-import { BaseListDto } from "@/common/common.dto";
 import { Transactional } from "typeorm-transactional";
 
 @Injectable()
@@ -15,7 +17,7 @@ export class LogService {
     private readonly logRepo: LogRepository,
   ) {}
 
-  async list(tenantId: number, data: BaseListDto & { level?: string }): Promise<ListResultDto<LogResponseDto>> {
+  async list(tenantId: number, data: LogListReqDto): Promise<ListResultDto<LogResponseDto>> {
     const { page, size, level } = data;
     const [items, total] = await this.logRepo.findByTenantWithPagination(tenantId, page, size, level);
 
@@ -23,7 +25,8 @@ export class LogService {
     return { total, list };
   }
 
-  async findByRequestId(requestId: string): Promise<LogResponseDto[]> {
+  async findByRequestId(data: GetByReqIdDto): Promise<LogResponseDto[]> {
+    const { requestId } = data;
     const items = await this.logRepo.findByRequestId(requestId);
     return this.format(items);
   }

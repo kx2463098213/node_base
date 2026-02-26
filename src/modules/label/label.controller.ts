@@ -7,7 +7,7 @@ import { BaseListDto } from "@/common/common.dto";
 import { ListResultDto } from "@/shared/remote/http.service";
 import { scopeUtils } from "@/common/utils/scope-utils";
 
-@ApiTags("标签")
+@ApiTags("tag.label")
 @Controller('label')
 export class LabelController {
   constructor(
@@ -15,27 +15,27 @@ export class LabelController {
   ) { }
 
   @Post('/list')
-  @ApiOperation({ summary: '获取标签列表' })
+  @ApiOperation({ summary: 'api.label.list' })
   @ApiBody({ type: BaseListDto })
-  @ApiResponse({ status: 200, description: '成功获取标签列表' })
+  @ApiResponse({ status: 200, description: 'api.label.list' })
   async getLabelList(@Body() data: BaseListDto): Promise<ListResultDto<LabelResponseDto>> {
     const tenantId = scopeUtils.getTenantId();
     return this.labelSvc.list(tenantId, data)
   }
 
   @Post('/add')
-  @ApiOperation({ summary: '添加标签' })
+  @ApiOperation({ summary: 'api.label.add' })
   @ApiBody({ type: LabelAddDataDto })
-  @ApiResponse({ status: 200, description: '成功添加标签' })
+  @ApiResponse({ status: 200, description: 'api.label.add' })
   async add(@Body() data: LabelAddDataDto): Promise<LabelOrmEntity> {
     const tenantId = scopeUtils.getTenantId();
     return this.labelSvc.add(tenantId, data);
   }
 
   @Post('/delete')
-  @ApiOperation({ summary: '删除标签' })
+  @ApiOperation({ summary: 'api.label.delete' })
   @ApiBody({ type: LabelDeleteDto })
-  @ApiResponse({ status: 200, description: '成功删除标签' })
+  @ApiResponse({ status: 200, description: 'api.label.delete' })
   async delete(@Body() data: LabelDeleteDto): Promise<boolean> {
     const tenantId = scopeUtils.getTenantId();
     return this.labelSvc.delete(tenantId, data);

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsOptional, IsArray, ArrayMinSize } from "class-validator";
+import { IsString, IsOptional, IsArray, ArrayMinSize, IsNotEmpty } from "class-validator";
+import { BaseListDto } from "@/common/common.dto";
 
 export class LogCreateDto {
   @IsString()
@@ -30,6 +31,20 @@ export class LogDeleteDto {
   @ArrayMinSize(1)
   @ApiProperty({ description: '日志ID数组', type: [String], isArray: true })
   ids: string[];
+}
+
+export class GetByReqIdDto {
+  @ApiProperty({ description: 'param.log.reqId', example: '1' })
+  @IsString()
+  @IsNotEmpty()
+  requestId: string;
+}
+
+export class LogListReqDto extends BaseListDto {
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ description:  'param.log.reqId' })
+  level?: string;
 }
 
 export interface LogResponseDto {

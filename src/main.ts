@@ -10,6 +10,9 @@ import { Logger } from "./common/logger/logger";
 import { isLocal } from "./core/config";
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { initializeTransactionalContext } from "typeorm-transactional";
+import { MyI18nService } from "./shared/i18n/my.i18n.service";
+import { LANGUAGE_TYPE } from "./common/common.dto";
+import { INestApplication } from "@nestjs/common";
 
 async function bootstrap(): Promise<void> {
   initializeTransactionalContext(); // mysql 的事务，使用方式为用 @Transactional 装饰方法
@@ -38,21 +41,56 @@ async function bootstrap(): Promise<void> {
   const configService = app.get(ConfigService);
   const port = configService.get("port") || 9421;
 
-  const options = new DocumentBuilder()
-    .setTitle('BaseProject')
-    .setDescription('BaseProject  接口文档接口文档')
-    .setVersion('0.1')
-    .build();
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('docs', app, document);
+  initSwagger(app);
 
   await app.listen(port).then(() => {
     const logger = new Logger(AppModule.name);
     if (isLocal) {
       logger.info(`Server Start: http://localhost:${port}`);
+      logger.info(`Server Openapi: http://localhost:${port}/openapi.json`);
+      logger.info(`Server Docs: http://localhost:${port}/docs`);
     } else {
       logger.info(`Server Start, listen port: ${port}`);
     }
   });
 }
 bootstrap()
+
+function initSwagger(app: INestApplication): void {
+    const options = new DocumentBuilder()
+    .setTitle('BaseProject')
+    .setDescription('BaseProject  接口文档接口文档')
+    .setVersion('0.1')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: '请输入 Bearer Token（用于接口调试）',
+      },
+      'bearer'
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+
+  // 为所有接口自动应用 Bearer Auth
+  for (const path in document.paths) {
+    for (const method in document.paths[path]) {
+      const operation = document.paths[path][method];
+      if (!operation.security) {
+        operation.security = [];
+      }
+      operation.security.push({ 'bearer': [] });
+    }
+  }
+
+  const myI18nService = app.get(MyI18nService);
+  const translatedDoc = myI18nService.translateSwaggerDocument(document, LANGUAGE_TYPE.Zh_CN) as any;
+  SwaggerModule.setup('docs', app, translatedDoc);
+
+  app.getHttpAdapter().get('/openapi.json', (req, res) => {
+    const lang = req['headers']?.['accept-language'] || LANGUAGE_TYPE.Zh_CN;
+    const translatedDoc = myI18nService.translateSwaggerDocument(document, lang);
+    res.json(translatedDoc);
+  });
+}

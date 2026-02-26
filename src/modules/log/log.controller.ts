@@ -1,38 +1,42 @@
-import { Controller, Get, Post, Delete, Body, Query, Param } from "@nestjs/common";
-import { ApiTags, ApiOperation } from "@nestjs/swagger";
+import { Controller, Post, Body } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiExcludeEndpoint } from "@nestjs/swagger";
 import { LogService } from "./log.service";
-import { LogCreateDto, LogDeleteDto } from "./dto/log.dto";
-import { BaseListDto } from "@/common/common.dto";
+import {
+  GetByReqIdDto, LogCreateDto, LogDeleteDto, LogListReqDto,
+} from "./dto/log.dto";
+import { scopeUtils } from "@/common/utils/scope-utils";
 
-@ApiTags('日志管理')
+@ApiTags('tag.log')
 @Controller('log')
 export class LogController {
   constructor(private readonly logService: LogService) {}
 
-  @Get('list')
-  @ApiOperation({ summary: '获取日志列表' })
-  async list(@Query() query: BaseListDto & { level?: string }) {
-    const tenantId = 1; // TODO: 从上下文获取
-    return this.logService.list(tenantId, query);
+  @Post('list')
+  @ApiOperation({ summary: 'api.log.list' })
+  async list(@Body() data: LogListReqDto) {
+    const tenantId = scopeUtils.getTenantId();
+    return this.logService.list(tenantId, data);
   }
 
-  @Get('request/:requestId')
-  @ApiOperation({ summary: '根据请求ID获取日志' })
-  async findByRequestId(@Param('requestId') requestId: string) {
-    return this.logService.findByRequestId(requestId);
+  @Post('get-by-request-id')
+  @ApiOperation({ summary: 'api.log.getByReqId' })
+  async findByRequestId(@Body() data: GetByReqIdDto) {
+    return this.logService.findByRequestId(data);
   }
 
+  @ApiExcludeEndpoint()
   @Post('create')
   @ApiOperation({ summary: '创建日志' })
   async create(@Body() data: LogCreateDto) {
-    const tenantId = 1; // TODO: 从上下文获取
+    const tenantId = scopeUtils.getTenantId();
     return this.logService.create(tenantId, data);
   }
 
-  @Delete('delete')
+  @ApiExcludeEndpoint()
+  @Post('delete')
   @ApiOperation({ summary: '删除日志' })
   async delete(@Body() data: LogDeleteDto) {
-    const tenantId = 1; // TODO: 从上下文获取
+    const tenantId = scopeUtils.getTenantId();
     return this.logService.delete(tenantId, data);
   }
 }

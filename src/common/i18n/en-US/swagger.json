@@ -1,1 +1,35 @@
-{}
+{
+  "tag": {
+    "log": "Log Manager (MongoDB)",
+    "label": "Label Manager (MySQL)"
+  },
+  "api": {
+    "label": {
+      "list": "Label List",
+      "add": "Add new label",
+      "delete": "Delete Label"
+    },
+    "log": {
+      "list": "Log list",
+      "getByReqId": "Get Logs by request Id"
+    }
+  },
+  "param": {
+    "common": {
+      "id": "ID",
+      "page": "Page number, minimum 1, default 1",
+      "size": "Page size, minimum 10, default 10",
+      "beginTime": "Start Time (Unix Timestamp)",
+      "endTime": "End Time (Unix Timestamp)",
+      "word": "Search Keyword"
+    },
+    "label": {
+      "ids": "Label ids",
+      "name": "Label name",
+      "desc": "Label description"
+    },
+    "log": {
+      "reqId": "Request id"
+    }
+  }
+}

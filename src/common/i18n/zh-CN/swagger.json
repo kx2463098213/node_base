@@ -1,1 +1,35 @@
-{}
+{
+  "tag": {
+    "log": "日志管理（Mongo 示例）",
+    "label": "标签管理（MySQL 示例）"
+  },
+  "api": {
+    "label": {
+      "list": "标签列表",
+      "add": "新增标签",
+      "delete": "删除标签"
+    },
+    "log": {
+      "list": "日志列表",
+      "getByReqId": "根据请求ID获取日志"
+    }
+  },
+  "param": {
+    "common": {
+      "id": "ID",
+      "page": "页码, 最小值 1, 默认值 1",
+      "size": "每页大小， 最小值 10, 默认值 10",
+      "beginTime": "开始时间(unix时间戳)",
+      "endTime": "结束时间(unix时间戳)",
+      "word": "搜索关键词"
+    },
+    "label": {
+      "ids": "标签 id 数组",
+      "name": "标签名称",
+      "desc": "标签描述"
+    },
+    "log": {
+      "reqId": "请求 id"
+    }
+  }
+}
