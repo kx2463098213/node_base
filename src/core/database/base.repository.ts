@@ -4,6 +4,7 @@ import {
 } from "typeorm";
 import { DBOperation, DBType } from "@/common/constants/db.enum";
 import { scopeUtils } from "@/common/utils/scope-utils";
+import { Logger } from "@/common/logger/logger";
 
 // 类型定义
 type IdType = string | number | bigint;
@@ -12,6 +13,7 @@ type UpdateDataType<E> = DeepPartial<E>;
 type EntityManager = any; // 由于 MySQL 和 MongoDB 的 Manager 类型不同，这里用 any
 
 export abstract class BaseRepository<E extends ObjectLiteral, TService> {
+  private readonly logger = new Logger('baseRepo');
   constructor(
     protected readonly dbService: TService,
     protected readonly entity: EntityTarget<E>,
@@ -164,7 +166,7 @@ export abstract class BaseRepository<E extends ObjectLiteral, TService> {
     try {
       const result = await fn();
       // Prometheus 埋点：entityName, operation, methodName, dbType
-      console.log(`[Metrics] ${this.entityName}.${methodName} [${operation}] - ${Date.now() - start}ms`);
+      this.logger.debug(`[Metrics] ${this.entityName}.${methodName} [${operation}] - ${Date.now() - start}ms`);
       return result;
     } catch (e) { throw e; }
   }

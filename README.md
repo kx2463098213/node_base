@@ -1,3 +1,5 @@
+> 需求 node 版本 >= 20
+
 简介：  
 
 1、在 .npmrc 文件中设置镜像源；  
@@ -8,9 +10,9 @@
 
 4、`src/share/remote` 封装对其他服务的基础请求；  
 
-5、错误信息的 i18n 主要在 `src/core/filters/custom-exception.filter.ts` 中实现 => 使用方式：手动抛 CustomException, 第一个参数传 ErrorCode，ErrorCode 的值要在 `src/common/i18n/` 文件夹下有注册；  
+5、错误信息的 i18n 主要在 `src/core/filters/custom-exception.filter.ts` 中实现，使用方式：手动抛 CustomException, 第一个参数传 ErrorCode，ErrorCode 的值要在 `src/common/i18n/` 文件夹下有注册；  
 
-6、src/common/scope-utils 主要用于通过 ALS 传递请求中的一些信息（结合 `ScopeStoreMiddleware` 及 `UCAuthGuard`），禁止在 service 中注入 request，防止污染 service 和 controller 的作用域；  
+6、src/common/scope-utils 主要用于通过 ALS 传递请求中的一些信息（结合 `ScopeStoreMiddleware` 及 `UCAuthGuard`），禁止在 service 构造中注入 request，防止污染 service 和 controller 的作用域（可以在 controller 的方法中使用 `@Req`，然后再通过传值的方式传给 service，这种不会对作用域有影响）；  
 
 7、目前基础代码支持对接 mongodb、mysql、redis；  
 
@@ -30,9 +32,13 @@
 | **复用级别** | **跨项目复用**（直接复制即可运行） | **项目内唯一**（通常不可跨项目复用） | **高复用**（可作为私有库或 npm 包） | **低复用**（强耦合具体业务逻辑） |
 | **主要职责** | 定义“是什么” (数据结构) | 定义“怎么跑” (运行环境) | 定义“能干什么” (通用能力) | 定义“做业务” (核心价值) |
   
+10、如何利用 v8 的隐藏类优化执行性能  
 
-> 需求 node 版本 >= 20
+* **不要在构造函数之外动态添加属性**：避免使用 `delete` 或动态赋值；  
+* **总是初始化属性**：即便初始值是 `undefined` 或 `null`，也要在类成员声明处赋值（见 CommonResWithUserDto）；  
+* **保持属性赋值顺序一致**：虽然类属性声明通常锁定了顺序，但在处理普通字面量对象（Object Literals）时要格外小心；  
 
+> 如果你的 DTO 结构极其复杂且多变，V8 可能会创建数以千计的隐藏类，导致 **“隐藏类污染”**。通过显式声明和初始化，你不仅加快了速度，还优化了内存占用，因为 V8 可以复用相同的隐藏类元数据。  
 
 ```bash
 $ npm install
