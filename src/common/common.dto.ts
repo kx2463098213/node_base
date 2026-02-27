@@ -63,16 +63,18 @@ export class SimpleUserInfo {
   name: string;
 }
 
+// 这里的 userInfo 默认值为 null，并且在构造中如果不传也默认赋值为 null，防止 v8 隐藏类劣化为多态而降低执行性能
 export class CommonResWithUserDto<T extends TenantBaseOrmEntity> extends CommonResDto<T> {
-  constructor(entity: T) {
+  constructor(entity: T, userInfo?: SimpleUserInfo) {
     if (_.isEmpty(entity)) {
       return;
     }
     super(entity);
+    this.userInfo = userInfo || null;
   }
 
   @ApiPropertyOptional({ description: 'user.info', type: SimpleUserInfo })
-  userInfo?: SimpleUserInfo;
+  userInfo?: SimpleUserInfo | null = null;
 }
 
 export class BaseListDto {

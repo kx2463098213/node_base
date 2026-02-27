@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 import { Transform } from "class-transformer"
 import { ArrayMinSize, IsArray, IsOptional, IsString } from "class-validator"
 import { TransAny2Str } from "@/common/common-transform"
-import { BaseCodeResDto, CommonResWithUserDto } from "@/common/common.dto"
+import { BaseCodeResDto, CommonResWithUserDto, SimpleUserInfo } from "@/common/common.dto"
 import { LabelOrmEntity } from "../entities/label.orm-entity"
 
 export class LabelAddDataDto {
@@ -25,8 +25,8 @@ export class LabelDeleteDto {
 }
 
 export class LabelResponseDto extends CommonResWithUserDto<LabelOrmEntity> {
-  constructor(entity: LabelOrmEntity) {
-    super(entity);
+  constructor(entity: LabelOrmEntity, userInfo?: SimpleUserInfo) {
+    super(entity, userInfo);
     this.name = entity.name;
     this.description = entity.description;
   }

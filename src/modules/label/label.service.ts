@@ -5,7 +5,7 @@ import { LabelOrmEntity } from "./entities/label.orm-entity";
 import { CustomException } from "@/common/exceptions/custom.exception";
 import { Transactional } from "typeorm-transactional";
 import { ListResultDto } from "@/shared/remote/http.service";
-import { BaseListDto } from "@/common/common.dto";
+import { BaseListDto, SimpleUserInfo } from "@/common/common.dto";
 import { UserService } from "@/shared/remote/uc/user.service";
 import { LabelRepository } from "./repositories/label.repository";
 import { ErrorCode } from "@/common/constants/error-code";
@@ -28,13 +28,15 @@ export class LabelService {
     const userMap = new Map(users.items.map(v => [v._id, v.name]));
 
     const list = items.map(it => {
-      const dto = new LabelResponseDto(it);
-      const userId = dto.createdBy;
-        dto.userInfo = {
+      const userId = it.createdBy;
+      let userInfo: SimpleUserInfo|undefined = undefined;
+      if (userMap.has(userId)) {
+        userInfo = {
           id: userId,
           name: userMap.get(userId) || ''
         }
-      return dto;
+      }
+      return new LabelResponseDto(it, userInfo);
     });
 
     return { total, list }
