@@ -38,7 +38,11 @@ import { LogModule } from "./modules/log/log.module";
     },
     {
       provide: APP_PIPE,
-      useClass: I18nValidationPipe,
+      useFactory: () => {
+        return new I18nValidationPipe({
+          whitelist: true,
+        });
+      }
     },
   ]
 })
