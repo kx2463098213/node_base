@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
+import { ObjectId } from "mongodb";
 import { LogEntity } from "../entities/log.entity";
 import { MongoService } from "@/core/database/mongo/mongo";
-import { DBType } from "@/common/constants/db.enum";
 import { MongoBaseRepository } from "@/core/database/mongo/mongo.base.respoitory";
 
 @Injectable()
@@ -37,6 +37,16 @@ export class LogRepository extends MongoBaseRepository<LogEntity> {
   }
 
   async softDeleteByIds(tenantId: number, ids: string[]): Promise<void> {
-    await this.softDelete({ tenantId, _id: { $in: ids } } as any);
+    // 将 string[] 转换为 ObjectId[] 以匹配 MongoDB _id 类型
+    const objectIds = ids.map(id => {
+      try {
+        return new ObjectId(id);
+      } catch (e) {
+        // 如果转换失败，返回原始字符串（让 MongoDB 处理错误）
+        return id;
+      }
+    });
+    // 使用 as any 绕过 TypeORM 的类型检查，因为 MongoDB 的 $in 操作符不在 TypeORM 类型定义中
+    await this.softDelete({ tenantId, _id: { $in: objectIds } } as any);
   }
 }

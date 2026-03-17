@@ -59,8 +59,8 @@ export class CustomExceptionFilter implements ExceptionFilter {
     this.recursiveParse(errors, messages);
     return messages.join('; ');
   }
-  
-  private async recursiveParse(errors: I18nValidationError[], messages: string[]) {
+
+  private recursiveParse(errors: I18nValidationError[], messages: string[]) {
     errors = errors || [];
     for (const error of errors) {
       const constraints = error.constraints;
@@ -70,8 +70,8 @@ export class CustomExceptionFilter implements ExceptionFilter {
           messages.push(this.i18n.getValidateMessage(key, { property }, value as string));
         }
       }
-      if (_.isEmpty(error.children)) {
-        await this.recursiveParse(error.children as I18nValidationError[], messages); // 递归处理子错误
+      if (!_.isEmpty(error.children)) {
+        this.recursiveParse(error.children as I18nValidationError[], messages); // 递归处理子错误
       }
     }
   }

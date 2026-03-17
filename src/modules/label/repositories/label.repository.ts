@@ -33,6 +33,8 @@ export class LabelRepository extends MysqlBaseRepository<LabelOrmEntity> {
   }
 
   async softDeleteByIds(tenantId: number, ids: string[], manager?: EntityManager) {
-    return this.softDelete({ tenantId, id: In(ids) }, manager);
+    // 将 string[] 转换为 bigint[] 以匹配实体 ID 类型
+    const bigintIds = ids.map(id => BigInt(id));
+    return this.softDelete({ tenantId, id: In(bigintIds) }, manager);
   }
 }

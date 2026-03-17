@@ -159,10 +159,11 @@ class Fmt {
   private static _timestamp: string;
   private static _disableColor: boolean =
     Boolean(process.env.NO_COLOR) || !isLocal;
+  private static intervalId: NodeJS.Timeout | null = null;
 
   private constructor() {
     Fmt.updateTimestamp();
-    setInterval(Fmt.updateTimestamp, 1e3);
+    Fmt.intervalId = setInterval(Fmt.updateTimestamp, 1e3);
   }
 
   public static getInstance() {
@@ -170,6 +171,13 @@ class Fmt {
       Fmt.instance = new Fmt();
     }
     return Fmt.instance;
+  }
+
+  public static destroy() {
+    if (Fmt.intervalId) {
+      clearInterval(Fmt.intervalId);
+      Fmt.intervalId = null;
+    }
   }
 
   static updateTimestamp() {

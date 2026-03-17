@@ -48,13 +48,13 @@ export class StorageService implements OnModuleInit {
 
   async onModuleInit() {
     const serviceProvider = this.configSvc.get('storage.provider')
-    if (serviceProvider == StorageProviderType.COS) {
+    if (serviceProvider === StorageProviderType.COS) {
       this.storageProvider = new CosProvider(this.configSvc)
-    } else if (serviceProvider == StorageProviderType.S3) {
+    } else if (serviceProvider === StorageProviderType.S3) {
       this.storageProvider = new S3Provider(this.configSvc)
-    } else if (serviceProvider == StorageProviderType.TOS) {
+    } else if (serviceProvider === StorageProviderType.TOS) {
       this.storageProvider = new TosProvider(this.configSvc)
-    } else if (serviceProvider == StorageProviderType.OBS) {
+    } else if (serviceProvider === StorageProviderType.OBS) {
       this.storageProvider = new ObsProvider(this.configSvc)
     } else {
       throw new Error('Unsupported service provider')
@@ -74,7 +74,7 @@ export class StorageService implements OnModuleInit {
   }
 
   async removeObject(key: string, access: BucketAccess = BucketAccess.PRIVATE) {
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
     return await this.storageProvider.removeObject(key, bucket)
   }
 
@@ -89,9 +89,9 @@ export class StorageService implements OnModuleInit {
   async uploadFile(file: Express.Multer.File, access: string = BucketAccess.PRIVATE, key: string = '') {
     const uniqueFileName = `uploads/${dayjs().unix()}_${file.originalname}`
     key = key || uniqueFileName
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
     const data = await this.storageProvider.uploadFile(file, bucket, key)
-    data['url'] = access == BucketAccess.PUBLIC ? data.location : await this.getPresignedUrl(key)
+    data['url'] = access === BucketAccess.PUBLIC ? data.location : await this.getPresignedUrl(key)
     return data
 
   }
@@ -135,7 +135,7 @@ export class StorageService implements OnModuleInit {
     key: string = '') {
     const uniqueFileName = `uploads/${dayjs().unix()}_${fileName}`
     key = key || uniqueFileName
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
     return await this.storageProvider.uploadFileByBuffer(buffer, mimeType, bucket, key)
   }
 
@@ -149,7 +149,7 @@ export class StorageService implements OnModuleInit {
   async uploadFileByBase64(base64: string, mimeType: string, access: string = BucketAccess.PRIVATE, key: string = '') {
     const uniqueFileName = `base64Uploads/${dayjs().toDate().getTime()}-${nanoid(6)}`
     key = key || uniqueFileName
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
     return await this.storageProvider.uploadFileByBase64(base64, bucket, key, mimeType)
   }
 
@@ -163,13 +163,13 @@ export class StorageService implements OnModuleInit {
   async uploadAndGetUrl(base64: string, mimeType: string, access: string = BucketAccess.PRIVATE, key: string = '') {
     const result = await this.uploadFileByBase64(base64, mimeType, access, key)
     if (result) {
-      const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+      const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
       return await this.storageProvider.getLongTermDownloadUrl(result)
     }
   }
 
   async getLongTermUrl(key: string, access: string = BucketAccess.PRIVATE) {
-    if (access == BucketAccess.PUBLIC) {
+    if (access === BucketAccess.PUBLIC) {
       return await this.storageProvider.getLongTermDownloadUrl(key)
     }
     return await this.getPresignedUrl(key, BucketAccess.PRIVATE, 86400 * 365) // 私有空间，默认链接有效期365天
@@ -177,12 +177,12 @@ export class StorageService implements OnModuleInit {
 
   // 生成带有效期的预签名 URL
   async getPresignedUrl(key: string, access: string = BucketAccess.PRIVATE, expiresIn: number = 3600) {
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
-    return await this.storageProvider.getDownloadUrl(key, bucket, expiresIn, access != BucketAccess.PUBLIC)
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    return await this.storageProvider.getDownloadUrl(key, bucket, expiresIn, access !== BucketAccess.PUBLIC)
   }
 
   async copyFrom(sourceLocation: string, key: string, access: string = BucketAccess.PRIVATE) {
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
     return await this.storageProvider.copyFrom(bucket, sourceLocation, key)
   }
 
@@ -194,7 +194,7 @@ export class StorageService implements OnModuleInit {
    * @param contentType
    */
   async createPutPresignedUrl(key: string, access: string = BucketAccess.PRIVATE, expiresIn: number = 3600, contentType: string = '') {
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
     return await this.storageProvider.createPutPresignedUrl(key, bucket, expiresIn, contentType)
   };
 
@@ -205,13 +205,13 @@ export class StorageService implements OnModuleInit {
    * @returns
    */
   async getObject(key: string, access: string = BucketAccess.PRIVATE): Promise<Buffer> {
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket
     return await this.storageProvider.getObject(key, bucket)
   }
 
   generateKey(key: string = '', prefix: string = '', ext: string = '') {
     key = key ? `${dayjs().unix()}_${key}` : `${dayjs().unix()}_${nanoid(6)}`
-    if (prefix == '') {
+    if (prefix !== '') {
       key = `${prefix}/${key}`
     }
     if (ext) {
@@ -244,7 +244,7 @@ export class StorageService implements OnModuleInit {
   }
 
   async checkExisted(key: string, access: string): Promise<boolean> {
-    const bucket = access == BucketAccess.PUBLIC ? this.publicBucket : this.bucket;
+    const bucket = access === BucketAccess.PUBLIC ? this.publicBucket : this.bucket;
     return await this.storageProvider.checkExisted(key, bucket)
   }
 }

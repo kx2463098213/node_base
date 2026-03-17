@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { I18nContext, I18nService } from "nestjs-i18n";
 import { Logger } from "@/common/logger/logger";
+import _ from "lodash";
 
 @Injectable()
 export class MyI18nService {
@@ -48,9 +49,8 @@ export class MyI18nService {
     if (this.swaggerCache.has(lang)) {
       return this.swaggerCache.get(lang);
     }
-    // 使用递归时直接修改新对象，或者在必要时才拷贝
-    // 如果不希望修改原 doc，建议在传入前 clone，或者使用更高效的深拷贝库
-    const newDoc = JSON.parse(JSON.stringify(doc));
+    // 使用 lodash.cloneDeep 进行深拷贝，性能优于 JSON.parse(JSON.stringify())
+    const newDoc = _.cloneDeep(doc);
 
     const traverse = (obj: any) => {
       if (!obj || typeof obj !== 'object') return;

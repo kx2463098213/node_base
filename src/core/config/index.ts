@@ -37,6 +37,8 @@ export function config() {
       provider: process.env.STORAGE_PROVIDER || 's3',
     },
     disableMqConsumer: process.env.DISABLE_MQ_CONSUMER || '1',
+    // 响应日志黑名单：这些路径不会记录响应日志
+    responseLogBlacklist: (process.env.RESPONSE_LOG_BLACKLIST || '/deploy/live,/deploy/ready,/user/info').split(','),
   }
 }
 

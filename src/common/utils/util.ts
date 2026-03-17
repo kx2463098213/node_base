@@ -87,17 +87,45 @@ export function Md5(str: string | Buffer, key?: string): string {
   return enc.digest("hex") as string;
 }
 
-export function Eval(context: any, expression: string, value?: string) {
-  const exp = expression.replace(/@var:/g, "Context.");
-  const evalValue = new Function(
-    "Context",
-    "_",
-    "value",
-    "util",
-    `return ${exp} || value;`
-  )(context, _, value, { Md5 });
+/**
+ * 安全的模板字符串替换函数
+ * 用于替换字符串中的变量占位符，如 @var:userId -> args[0]
+ *
+ * @param context - 上下文对象，包含 args 等属性
+ * @param expression - 表达式字符串，如 "@var:args[0]" 或 "user-@var:args[0]"
+ * @param value - 默认值
+ * @returns 替换后的字符串
+ *
+ * @example
+ * SafeEval({ args: [123, 'test'] }, '@var:args[0]') // 返回 '123'
+ * SafeEval({ args: [123] }, 'user-@var:args[0]') // 返回 'user-123'
+ */
+export function SafeEval(context: any, expression: string, value?: string): string {
+  if (!expression) return value || '';
 
-  return evalValue;
+  try {
+    // 只支持安全的变量替换模式：@var:args[index]
+    const result = expression.replace(/@var:args\[(\d+)\]/g, (match, index) => {
+      const idx = parseInt(index, 10);
+      if (context?.args && idx >= 0 && idx < context.args.length) {
+        return String(context.args[idx]);
+      }
+      return match; // 如果找不到，保持原样
+    });
+
+    return result || value || '';
+  } catch (e) {
+    return value || '';
+  }
+}
+
+/**
+ * @deprecated 此函数已被禁用，请使用 SafeEval 替代
+ * 原实现使用 new Function() 存在安全风险
+ */
+export function Eval(context: any, expression: string, value?: string) {
+  console.warn('Eval function is deprecated and disabled. Use SafeEval instead.');
+  return SafeEval(context, expression, value);
 }
 
 export function getRandomStr(size: number): string {

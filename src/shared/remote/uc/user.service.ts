@@ -156,7 +156,7 @@ export class UserService {
   }
 
   async getEmployeeByUserIdApi(companyId: number, userId: number) {
-    const url = await this.getUrl('/admin/employee/byUserId');
+    const url = this.getUrl('/admin/employee/byUserId');
     const resp = await this.httpService.post(url, {
       data: { 
         companyId,
