@@ -12,12 +12,15 @@ String slaveYAML = kube.getSimpleYAML()
 
 String envFlag = "${env.ENV_FLAG}"
 String envProxy = "${env.ENV_PROXY}"
-String projectGroup = "socialX"
-String projectName = "social-x-main"
 
-allowProdEnvs = ['main','master','prod']
+// ---- 项目配置（换项目时只需修改这里）----
+String projectGroup = "${env.PROJECT_GROUP ?: 'socialX'}"
+String projectName  = "${env.PROJECT_NAME  ?: 'social-x-main'}"
+String k8sCredentialsId = "${env.K8S_CREDENTIALS_ID ?: 'socialflow-k8s-cli-key'}"
+// ------------------------------------------
 
-k8sCredentialsId = 'socialflow-k8s-cli-key'
+allowProdEnvs = ['main', 'master', 'prod']
+
 if (!(envFlag in allowProdEnvs)) {
   image = "${harborUrl}/daily/${projectName}"
   k8sClusterContextName = 'none-prod'
