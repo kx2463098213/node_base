@@ -105,7 +105,7 @@ Response classes extend `CommonResDto<E>` or `CommonResWithUserDto<E>` from `src
 
 ### Auth Whitelist
 
-Routes bypassing authentication are defined in `UCAuthGuard.whiteList` (`src/core/guards/auth.guard.ts`). Currently whitelisted: `/`, `/deploy/ready`, `/deploy/live`, and any path matching `/admin/`.
+Routes bypassing authentication are defined in `UCAuthGuard.whiteList` (`src/core/guards/auth.guard.ts`). Currently whitelisted: `/`, `/health/ready`, `/health/live`, and any path matching `/admin/`.
 
 ### Swagger
 
@@ -122,3 +122,50 @@ Key env vars (defaults in `src/core/config/index.ts`):
 - `DISABLE_MQ_CONSUMER` — set to `1` to skip Pulsar consumer startup
 
 Copy `.env` for local overrides; use `.env.{ENV}` when `ENV` variable is set.
+
+## Coding Rules
+
+### No Request Injection in Services
+
+Never inject `Request` into a Service constructor — it forces NestJS to downgrade the service to request scope, causing the entire dependency chain to re-instantiate on every request. Use `scopeUtils` instead. `@Req()` is only acceptable in Controller methods, and only if the value is passed down as a plain argument.
+
+### Logging
+
+Use the custom `Logger` class, never `console.log`:
+
+```typescript
+private readonly logger = new Logger('ModuleName');
+this.logger.info('message %j', data);
+this.logger.error('error: %s', err.message);
+```
+
+### Transactions
+
+Wrap MySQL transactional methods with `@Transactional()` decorator from `typeorm-transactional`. Do not manually manage `EntityManager` or `QueryRunner`.
+
+### Soft Delete
+
+Never physically delete business records. All entities extending `SoftDeletedOrmEntity` have `deletedAt` / `deletedBy` fields. Use the repository's soft-delete methods.
+
+### ValidationPipe Behavior
+
+The global `I18nValidationPipe` is configured with `whitelist: true` — any DTO fields not explicitly declared with class-validator decorators are automatically stripped. Do not manually filter request body fields.
+
+### Architecture Layers
+
+When adding a new file, determine its layer in order:
+1. Has business domain logic → `modules/`
+2. Global interceptor / guard / filter / middleware / DB connection → `core/`
+3. No NestJS DI, pure TypeScript → `common/`
+4. Has `@Injectable()` and reused across multiple feature modules → `shared/`
+
+Dependency direction: `modules/` → `shared/` → `core/` → `common/`. Never import upward (e.g. `core/` must not import from `modules/`).
+
+### Domain Enums
+
+Enums specific to a single feature module (e.g. `BusinessLevel`, `MaterialType`) belong inside that module's directory, not in `common/constants/`.
+
+### Code Style
+
+Use 2 spaces for indentation throughout the codebase.
+
