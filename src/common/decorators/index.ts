@@ -1,5 +1,5 @@
 import { BaseException } from "@/common/exceptions/custom.exception";
-import { Eval } from "./util";
+import { Eval } from "@/common/utils/util";
 
 type ExpKeyGetter = (...args: any[]) => string;
 

@@ -1,6 +1,6 @@
 import { Column, Entity } from 'typeorm'
 import { TenantBaseOrmEntity } from '@/core/database/mysql/base-orm.entity'
-import { BusinessLevel, MaterialType } from '@/common/constants/label.enum';
+import { BusinessLevel, MaterialType } from '@/modules/label/label.enum';
 
 @Entity('label')
 export class LabelOrmEntity extends TenantBaseOrmEntity {

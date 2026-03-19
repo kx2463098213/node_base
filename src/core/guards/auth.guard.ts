@@ -25,8 +25,8 @@ export interface CustomRequest extends Request {
 export class UCAuthGuard {
   private whiteList = [
     '/',
-    '/deploy/ready',
-    '/deploy/live',
+    '/health/ready',
+    '/health/live',
     new RegExp('/admin/')
   ];
 

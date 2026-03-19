@@ -248,4 +248,3 @@ export class StorageService implements OnModuleInit {
     return await this.storageProvider.checkExisted(key, bucket)
   }
 }
-

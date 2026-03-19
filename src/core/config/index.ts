@@ -2,6 +2,26 @@ import _ from 'lodash'
 import dotenv from 'dotenv'
 import path from 'node:path'
 
+/**
+ * 生产环境必须配置的环境变量
+ * 若缺失则启动时立即报错，防止带着错误配置运行
+ */
+const REQUIRED_PROD_ENV_VARS = [
+  'MYSQL_URL',
+  'REDIS_URL',
+  'UC_ENDPOINT',
+];
+
+export function validateEnv() {
+  const deployEnv = process.env.DEPLOY_ENV || 'local';
+  if (deployEnv === 'local') return;
+
+  const missing = REQUIRED_PROD_ENV_VARS.filter(key => !process.env[key]);
+  if (missing.length > 0) {
+    throw new Error(`[Config] Missing required environment variables: ${missing.join(', ')}`);
+  }
+}
+
 export function config() {
   dotenv.config({path: path.resolve(process.cwd(), getEnvFile())})
   return {

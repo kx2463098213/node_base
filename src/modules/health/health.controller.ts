@@ -1,10 +1,10 @@
 import { Controller, Get } from "@nestjs/common";
 import { ApiExcludeController, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 
-@Controller("deploy")
-@ApiTags('部署')
+@Controller("health")
+@ApiTags('健康检查')
 @ApiExcludeController()
-export class DeployController {
+export class HealthController {
 
   @Get(["ready", "live"])
   @ApiOkResponse({ type: String, description: '健康检查' })
